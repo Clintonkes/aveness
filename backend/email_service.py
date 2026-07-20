@@ -91,6 +91,11 @@ def booking_confirmation_html(name: str, reference: str, address: str, frequency
 
 
 def booking_status_html(name: str, reference: str, status: str, address: str) -> str:
+    if hasattr(status, "value"):
+        status = status.value
+
+    display_status = status.capitalize()
+
     status_messages = {
         "approved": "Your service request has been <strong>approved</strong>. Our team will contact you shortly to schedule your first visit.",
         "cancelled": "Your service request has been <strong>cancelled</strong>. If you believe this is an error, please contact us.",
@@ -103,7 +108,7 @@ def booking_status_html(name: str, reference: str, status: str, address: str) ->
         "completed": "#1A3C34",
     }
 
-    message = status_messages.get(status, f"Your request status has been updated to {status}.")
+    message = status_messages.get(status, f"Your request status has been updated to {display_status}.")
     color = status_colors.get(status, "#1A3C34")
 
     return f"""
@@ -136,7 +141,7 @@ def booking_status_html(name: str, reference: str, status: str, address: str) ->
             </div>
             <div class="body">
                 <h2>Hello, {name}.</h2>
-                <div class="status-badge">{status}</div>
+                <div class="status-badge">{display_status}</div>
                 <p>{message}</p>
                 <div class="details">
                     <p><strong>Property Address:</strong> {address}</p>
