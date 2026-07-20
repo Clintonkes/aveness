@@ -6,8 +6,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from database import get_db, Admin
+import os
 
-SECRET_KEY = "aveness-secret-key-change-in-production"
+SECRET_KEY = os.getenv("SECRET_KEY", "aveness-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 

@@ -10,6 +10,12 @@ node_modules/
 dist/
 build/
 
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+backend/*.db
+
 # Editor directories and files
 .vscode/
 .idea/

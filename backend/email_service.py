@@ -2,16 +2,14 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
-# Email configuration
-SMTP_HOST = "127.0.0.1"
-SMTP_PORT = 1025
-SMTP_USER = ""
-SMTP_PASSWORD = ""
-SMTP_FROM = "avenessllc@proton.me"
-EMAIL_ENABLED = False
+# Email configuration - Resend API
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+EMAIL_FROM = os.getenv("EMAIL_FROM", "onboarding@resend.dev")
+EMAIL_ENABLED = bool(RESEND_API_KEY)
 
 
 def send_email(to_email: str, subject: str, html_body: str) -> bool:
@@ -20,19 +18,22 @@ def send_email(to_email: str, subject: str, html_body: str) -> bool:
         return True
 
     try:
-        msg = MIMEMultipart("alternative")
-        msg["From"] = SMTP_FROM
-        msg["To"] = to_email
-        msg["Subject"] = subject
+        import httpx
 
-        msg.attach(MIMEText(html_body, "html"))
-
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-            if SMTP_USER and SMTP_PASSWORD:
-                server.starttls()
-                server.login(SMTP_USER, SMTP_PASSWORD)
-            server.sendmail(SMTP_FROM, to_email, msg.as_string())
-
+        response = httpx.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {RESEND_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": EMAIL_FROM,
+                "to": [to_email],
+                "subject": subject,
+                "html": html_body,
+            },
+        )
+        response.raise_for_status()
         logger.info(f"Email sent to {to_email}: {subject}")
         return True
     except Exception as e:
