@@ -50,17 +50,24 @@ def startup():
 
 def _seed_admin():
     from database import SessionLocal
+    admin_password = os.getenv("ADMIN_PASSWORD")
+    if not admin_password:
+        # No ADMIN_PASSWORD set in this environment: leave whatever admin
+        # account already exists untouched, and don't create one with a
+        # guessable default.
+        return
+
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@avenessllc.com")
     db = SessionLocal()
     try:
-        admin_email = os.getenv("ADMIN_EMAIL", "admin@avenessllc.com")
-        admin_password = os.getenv("ADMIN_PASSWORD", "aveness123")
-        existing = db.query(Admin).filter(Admin.email == admin_email).first()
-        if not existing:
-            admin = Admin(
-                email=admin_email,
-                hashed_password=get_password_hash(admin_password),
-            )
-            db.add(admin)
+        existing = db.query(Admin).first()
+        if existing:
+            existing.email = admin_email
+            existing.hashed_password = get_password_hash(admin_password)
+            db.commit()
+            print(f"Admin credentials synced from environment: {admin_email}")
+        else:
+            db.add(Admin(email=admin_email, hashed_password=get_password_hash(admin_password)))
             db.commit()
             print(f"Admin seeded: {admin_email}")
     finally:
