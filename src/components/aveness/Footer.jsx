@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Mail, MapPin, ArrowUp } from "lucide-react";
+import { handleSectionLinkClick } from "@/lib/scrollToSection";
 
 export default function Footer() {
   const [showTop, setShowTop] = useState(false);
@@ -72,12 +73,14 @@ export default function Footer() {
             <div className="flex flex-wrap gap-3 mt-4">
               <a
                 href="#estimator"
+                onClick={handleSectionLinkClick("estimator")}
                 className="inline-flex items-center px-8 py-4 bg-gold text-obsidian text-sm font-medium tracking-wide hover:bg-gold/90 transition-colors"
               >
                 Request Care
               </a>
               <a
                 href="#contact-form"
+                onClick={handleSectionLinkClick("contact-form")}
                 className="inline-flex items-center px-8 py-4 border border-linen/30 text-linen text-sm font-medium tracking-wide hover:border-gold hover:text-gold transition-colors"
               >
                 Contact Us

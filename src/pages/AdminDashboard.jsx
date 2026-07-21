@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import {
-  LogOut, LayoutDashboard, Mail, Calendar, CheckCircle,
-  XCircle, Clock, Users, MessageSquare, ChevronDown,
+  LogOut, LayoutDashboard, Calendar, CheckCircle, Clock, MessageSquare, ChevronDown,
 } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pending", color: "bg-amber-100 text-amber-800" },

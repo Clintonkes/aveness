@@ -1,12 +1,13 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { handleSectionLinkClick } from "@/lib/scrollToSection";
 
 const NAV_LINKS = [
-  { label: "Services", href: "#services" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Approach", href: "#approach" },
-  { label: "Estimator", href: "#estimator" },
-  { label: "Contact", href: "#contact" },
+  { label: "Services", id: "services" },
+  { label: "Portfolio", id: "portfolio" },
+  { label: "Approach", id: "approach" },
+  { label: "Estimator", id: "estimator" },
+  { label: "Contact", id: "contact" },
 ];
 
 export default function Navbar() {
@@ -29,7 +30,11 @@ export default function Navbar() {
     >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12 flex items-center justify-between">
         {/* Brand + coordinates */}
-        <a href="#top" className="flex flex-col leading-none">
+        <a
+          href="#top"
+          onClick={handleSectionLinkClick("top")}
+          className="flex flex-col leading-none"
+        >
           <span
             className={`font-display text-2xl font-semibold tracking-tight ${
               scrolled ? "text-blade" : "text-linen"
@@ -50,8 +55,9 @@ export default function Navbar() {
         <nav className="hidden lg:flex items-center gap-10">
           {NAV_LINKS.map((l) => (
             <a
-              key={l.href}
-              href={l.href}
+              key={l.id}
+              href={`#${l.id}`}
+              onClick={handleSectionLinkClick(l.id)}
               className={`text-sm tracking-wide transition-colors ${
                 scrolled
                   ? "text-blade/80 hover:text-gold"
@@ -65,6 +71,7 @@ export default function Navbar() {
 
         <a
           href="#estimator"
+          onClick={handleSectionLinkClick("estimator")}
           className="hidden lg:inline-flex items-center px-5 py-2.5 bg-gold text-obsidian text-sm font-medium tracking-wide hover:bg-gold/90 transition-colors"
         >
           Request Care
@@ -86,9 +93,12 @@ export default function Navbar() {
           <nav className="flex flex-col px-6 py-6 gap-5">
             {NAV_LINKS.map((l) => (
               <a
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
+                key={l.id}
+                href={`#${l.id}`}
+                onClick={(e) => {
+                  handleSectionLinkClick(l.id)(e);
+                  setOpen(false);
+                }}
                 className="text-blade text-base tracking-wide"
               >
                 {l.label}
@@ -96,7 +106,10 @@ export default function Navbar() {
             ))}
             <a
               href="#estimator"
-              onClick={() => setOpen(false)}
+              onClick={(e) => {
+                handleSectionLinkClick("estimator")(e);
+                setOpen(false);
+              }}
               className="inline-flex items-center justify-center px-5 py-3 bg-gold text-obsidian text-sm font-medium"
             >
               Request Care

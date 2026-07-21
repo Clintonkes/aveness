@@ -16,8 +16,12 @@ export default function ScrollToTop() {
   const navigationType = useNavigationType();
 
   useEffect(() => {
-    if (navigationType === "POP") return;
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
 
+  useEffect(() => {
     if (hash) {
       const id = getHashId(hash);
       const timer = window.setTimeout(() => {

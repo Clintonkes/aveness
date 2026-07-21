@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Send, Mail, Phone, User, MessageSquare } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { extractErrorMessage } from "@/lib/apiError";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 export default function ContactForm() {
   const [data, setData] = useState({
@@ -32,7 +33,7 @@ export default function ContactForm() {
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.detail || "Failed to send message");
+        throw new Error(extractErrorMessage(err.detail, "Failed to send message"));
       }
       setData({ name: "", email: "", phone: "", subject: "", message: "" });
       toast({

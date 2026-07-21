@@ -1,0 +1,16 @@
+{
+  "name": "Aveness LLC — Estate Lawncare",
+  "short_name": "Aveness",
+  "description": "Professional lawncare and mowing for Naples, FL estates.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f1e8",
+  "theme_color": "#1a2e22",
+  "icons": [
+    {
+      "src": "https://base44.com/logo_v2.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

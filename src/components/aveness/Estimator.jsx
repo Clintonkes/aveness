@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Check, MapPin, Calendar, User, ArrowRight, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { extractErrorMessage } from "@/lib/apiError";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 const FREQUENCIES = [
   { id: "weekly", label: "Weekly", desc: "Peak-season estate standard" },
@@ -46,7 +47,7 @@ export default function Estimator() {
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.detail || "Submission failed");
+        throw new Error(extractErrorMessage(err.detail, "Submission failed"));
       }
       const result = await res.json();
       setReference(result.reference);
@@ -189,6 +190,7 @@ export default function Estimator() {
                   </label>
                   <input
                     type="text"
+                    required
                     value={data.name}
                     onChange={(e) => setData({ ...data, name: e.target.value })}
                     placeholder="Full name"
@@ -196,6 +198,7 @@ export default function Estimator() {
                   />
                   <input
                     type="email"
+                    required
                     value={data.email}
                     onChange={(e) => setData({ ...data, email: e.target.value })}
                     placeholder="Email address"

@@ -1,5 +1,6 @@
 import React, { useRef, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { handleSectionLinkClick } from "@/lib/scrollToSection";
 
 const HERO_IMG = "https://media.base44.com/images/public/6a5d5a3dd2e5eb4ee0df1b96/d65c989dd_generated_4e375043.png";
 const BEFORE_IMG = "https://media.base44.com/images/public/6a5d5a3dd2e5eb4ee0df1b96/493477298_generated_772bfbd1.png";
@@ -100,12 +101,14 @@ export default function Hero() {
         <div className="flex flex-wrap gap-4 mt-10 pointer-events-auto">
           <a
             href="#estimator"
+            onClick={handleSectionLinkClick("estimator")}
             className="inline-flex items-center px-8 py-4 bg-gold text-obsidian text-sm font-medium tracking-wide hover:bg-gold/90 transition-colors"
           >
             Instant Estimate
           </a>
           <a
             href="#portfolio"
+            onClick={handleSectionLinkClick("portfolio")}
             className="inline-flex items-center px-8 py-4 border border-linen/40 text-linen text-sm font-medium tracking-wide hover:border-gold hover:text-gold transition-colors"
           >
             View Portfolio

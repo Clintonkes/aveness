@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { extractErrorMessage } from '@/lib/apiError';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const AuthContext = createContext();
 
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     });
     if (!res.ok) {
       const err = await res.json();
-      throw new Error(err.detail || 'Login failed');
+      throw new Error(extractErrorMessage(err.detail, 'Login failed'));
     }
     const data = await res.json();
     localStorage.setItem('aveness_admin_token', data.access_token);
