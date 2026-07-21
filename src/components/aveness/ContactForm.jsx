@@ -26,7 +26,7 @@ export default function ContactForm() {
         body: JSON.stringify({
           name: data.name,
           email: data.email,
-          phone: data.phone || null,
+          phone: data.phone,
           subject: data.subject || null,
           message: data.message,
         }),
@@ -102,10 +102,11 @@ export default function ContactForm() {
 
             <div>
               <label className="flex items-center gap-2 font-mono-coord text-xs tracking-[0.2em] text-blade/60 mb-3">
-                <Phone size={14} /> PHONE (OPTIONAL)
+                <Phone size={14} /> PHONE
               </label>
               <input
                 type="tel"
+                required
                 value={data.phone}
                 onChange={(e) => setData({ ...data, phone: e.target.value })}
                 placeholder="+1 (239) 000-0000"

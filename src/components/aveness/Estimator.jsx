@@ -42,7 +42,7 @@ export default function Estimator() {
           frequency: data.frequency,
           name: data.name,
           email: data.email,
-          phone: data.phone || null,
+          phone: data.phone,
         }),
       });
       if (!res.ok) {
@@ -206,9 +206,10 @@ export default function Estimator() {
                   />
                   <input
                     type="tel"
+                    required
                     value={data.phone}
                     onChange={(e) => setData({ ...data, phone: e.target.value })}
-                    placeholder="Phone (optional)"
+                    placeholder="Phone number"
                     className="w-full bg-transparent border-b-2 border-blade/20 focus:border-gold py-3 text-lg font-light outline-none transition-colors"
                   />
                 </div>

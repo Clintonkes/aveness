@@ -8,7 +8,7 @@ class BookingCreate(BaseModel):
     frequency: str
     name: str
     email: EmailStr
-    phone: Optional[str] = None
+    phone: str
 
 
 class BookingResponse(BaseModel):
@@ -34,7 +34,7 @@ class BookingStatusUpdate(BaseModel):
 class ContactCreate(BaseModel):
     name: str
     email: EmailStr
-    phone: Optional[str] = None
+    phone: str
     subject: Optional[str] = None
     message: str
 
