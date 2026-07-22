@@ -41,7 +41,16 @@ def send_email(to_email: str, subject: str, html_body: str) -> bool:
         return False
 
 
-def booking_confirmation_html(name: str, reference: str, address: str, frequency: str) -> str:
+TIME_WINDOW_LABELS = {
+    "morning": "Morning (8am–12pm)",
+    "afternoon": "Afternoon (12pm–4pm)",
+    "evening": "Evening (4pm–7pm)",
+}
+
+
+def booking_confirmation_html(name: str, reference: str, address: str, frequency: str, preferred_date=None, preferred_time: str = None) -> str:
+    date_display = preferred_date.strftime("%B %-d, %Y") if preferred_date else "To be scheduled"
+    time_display = TIME_WINDOW_LABELS.get(preferred_time, preferred_time or "To be scheduled")
     return f"""
     <!DOCTYPE html>
     <html>
@@ -75,6 +84,8 @@ def booking_confirmation_html(name: str, reference: str, address: str, frequency
                 <div class="details">
                     <p><strong>Property Address:</strong> {address}</p>
                     <p><strong>Service Frequency:</strong> {frequency.title()}</p>
+                    <p><strong>Preferred Start Date:</strong> {date_display}</p>
+                    <p><strong>Preferred Time:</strong> {time_display}</p>
                     <p><strong>Status:</strong> Pending Review</p>
                 </div>
                 <p>We appreciate your interest in Aveness. Our team is committed to providing the highest standard of estate lawncare in Naples, Florida.</p>

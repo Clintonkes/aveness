@@ -33,6 +33,15 @@ const FREQUENCY_LABELS = {
   seasonal: "Seasonal",
 };
 
+const TIME_WINDOW_LABELS = {
+  morning: "Morning (8am–12pm)",
+  afternoon: "Afternoon (12pm–4pm)",
+  evening: "Evening (4pm–7pm)",
+};
+
+const formatDate = (iso) =>
+  new Date(iso).toLocaleDateString(undefined, { dateStyle: "medium" });
+
 const TAB_LABELS = {
   bookings: "Service Requests",
   contacts: "Messages",
@@ -294,6 +303,37 @@ function PaginationBar({ page, totalPages, onPageChange }) {
   );
 }
 
+function StatusDropdown({ booking, onUpdateStatus, open, onToggle }) {
+  return (
+    <div className="relative">
+      <button
+        onClick={onToggle}
+        className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium ${
+          STATUS_OPTIONS.find((s) => s.value === booking.status)?.color || "bg-gray-100 text-gray-800"
+        }`}
+      >
+        {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+        <ChevronDown size={12} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 bg-obsidian border border-linen/20 shadow-lg z-10 min-w-[140px]">
+          {STATUS_OPTIONS.map((s) => (
+            <button
+              key={s.value}
+              onClick={() => onUpdateStatus(booking.id, s.value)}
+              className={`block w-full text-left px-4 py-2.5 text-sm text-linen hover:bg-linen/10 transition-colors ${
+                booking.status === s.value ? "font-medium" : ""
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function BookingsTable({ bookings, onUpdateStatus, onView }) {
   const [openDropdown, setOpenDropdown] = useState(null);
   const { page, setPage, totalPages, paged } = usePagedData(bookings);
@@ -302,9 +342,15 @@ function BookingsTable({ bookings, onUpdateStatus, onView }) {
     return <p className="text-linen/40 text-center py-10">No service requests yet.</p>;
   }
 
+  const handleUpdateStatus = (id, value) => {
+    onUpdateStatus(id, value);
+    setOpenDropdown(null);
+  };
+
   return (
     <div>
-      <div className="overflow-x-auto">
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-linen/10">
@@ -327,35 +373,12 @@ function BookingsTable({ bookings, onUpdateStatus, onView }) {
                 <td className="py-4 px-4 text-linen/70 text-sm max-w-[200px] truncate">{b.address}</td>
                 <td className="py-4 px-4 text-linen/70 text-sm">{FREQUENCY_LABELS[b.frequency] || b.frequency}</td>
                 <td className="py-4 px-4 relative">
-                  <div className="relative">
-                    <button
-                      onClick={() => setOpenDropdown(openDropdown === b.id ? null : b.id)}
-                      className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium ${
-                        STATUS_OPTIONS.find((s) => s.value === b.status)?.color || "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {b.status.charAt(0).toUpperCase() + b.status.slice(1)}
-                      <ChevronDown size={12} />
-                    </button>
-                    {openDropdown === b.id && (
-                      <div className="absolute top-full left-0 mt-1 bg-obsidian border border-linen/20 shadow-lg z-10 min-w-[140px]">
-                        {STATUS_OPTIONS.map((s) => (
-                          <button
-                            key={s.value}
-                            onClick={() => {
-                              onUpdateStatus(b.id, s.value);
-                              setOpenDropdown(null);
-                            }}
-                            className={`block w-full text-left px-4 py-2.5 text-sm text-linen hover:bg-linen/10 transition-colors ${
-                              b.status === s.value ? "font-medium" : ""
-                            }`}
-                          >
-                            {s.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <StatusDropdown
+                    booking={b}
+                    onUpdateStatus={handleUpdateStatus}
+                    open={openDropdown === b.id}
+                    onToggle={() => setOpenDropdown(openDropdown === b.id ? null : b.id)}
+                  />
                 </td>
                 <td className="py-4 px-4 text-linen/50 text-xs font-mono-coord whitespace-nowrap">
                   {formatDateTime(b.created_at)}
@@ -374,6 +397,36 @@ function BookingsTable({ bookings, onUpdateStatus, onView }) {
           </tbody>
         </table>
       </div>
+
+      {/* Mobile cards */}
+      <div className="sm:hidden space-y-3">
+        {paged.map((b) => (
+          <div key={b.id} className="bg-obsidian/50 border border-linen/10 p-4">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="min-w-0">
+                <p className="text-linen text-sm font-medium truncate">{b.name}</p>
+                <p className="text-linen/60 text-xs mt-0.5 break-all">{b.email}</p>
+              </div>
+              <StatusDropdown
+                booking={b}
+                onUpdateStatus={handleUpdateStatus}
+                open={openDropdown === b.id}
+                onToggle={() => setOpenDropdown(openDropdown === b.id ? null : b.id)}
+              />
+            </div>
+            <p className="font-mono-coord text-gold text-[11px] tracking-wide">{b.reference}</p>
+            <p className="text-linen/50 text-xs font-mono-coord mt-1">{formatDateTime(b.created_at)}</p>
+            <button
+              onClick={() => onView(b)}
+              aria-label={`View booking ${b.reference}`}
+              className="inline-flex items-center gap-1.5 mt-3 text-gold text-xs font-medium"
+            >
+              <Eye size={14} /> View details
+            </button>
+          </div>
+        ))}
+      </div>
+
       <PaginationBar page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
@@ -388,7 +441,8 @@ function ContactsTable({ contacts, onView }) {
 
   return (
     <div>
-      <div className="overflow-x-auto">
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-linen/10">
@@ -424,6 +478,32 @@ function ContactsTable({ contacts, onView }) {
           </tbody>
         </table>
       </div>
+
+      {/* Mobile cards */}
+      <div className="sm:hidden space-y-3">
+        {paged.map((c) => (
+          <div key={c.id} className="bg-obsidian/50 border border-linen/10 p-4">
+            <div className="min-w-0">
+              <p className="text-linen text-sm font-medium truncate">{c.name}</p>
+              <p className="text-linen/60 text-xs mt-0.5 break-all">{c.email}</p>
+            </div>
+            {c.subject && (
+              <p className="font-mono-coord text-gold text-[11px] tracking-wide mt-2">
+                {c.subject.toUpperCase()}
+              </p>
+            )}
+            <p className="text-linen/50 text-xs font-mono-coord mt-1">{formatDateTime(c.created_at)}</p>
+            <button
+              onClick={() => onView(c)}
+              aria-label={`View message from ${c.name}`}
+              className="inline-flex items-center gap-1.5 mt-3 text-gold text-xs font-medium"
+            >
+              <Eye size={14} /> View details
+            </button>
+          </div>
+        ))}
+      </div>
+
       <PaginationBar page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
@@ -466,6 +546,14 @@ function BookingDetailDialog({ booking, onOpenChange }) {
               <DetailRow
                 label="FREQUENCY"
                 value={FREQUENCY_LABELS[booking.frequency] || booking.frequency}
+              />
+              <DetailRow
+                label="PREFERRED START DATE"
+                value={booking.preferred_date ? formatDate(booking.preferred_date) : "—"}
+              />
+              <DetailRow
+                label="PREFERRED TIME"
+                value={TIME_WINDOW_LABELS[booking.preferred_time] || booking.preferred_time || "—"}
               />
               <DetailRow label="SUBMITTED" value={formatDateTime(booking.created_at)} />
               <DetailRow label="LAST UPDATED" value={formatDateTime(booking.updated_at)} />

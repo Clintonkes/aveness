@@ -11,11 +11,21 @@ const FREQUENCIES = [
   { id: "seasonal", label: "Seasonal", desc: "Quarterly deep programs" },
 ];
 
+const TIME_WINDOWS = [
+  { id: "morning", label: "Morning (8am–12pm)" },
+  { id: "afternoon", label: "Afternoon (12pm–4pm)" },
+  { id: "evening", label: "Evening (4pm–7pm)" },
+];
+
+const todayISO = () => new Date().toISOString().split("T")[0];
+
 export default function Estimator() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState({
     address: "",
     frequency: "",
+    preferredDate: "",
+    preferredTime: "",
     name: "",
     email: "",
     phone: "",
@@ -25,9 +35,19 @@ export default function Estimator() {
   const [reference, setReference] = useState("");
   const { toast } = useToast();
 
+  const startNewRequest = () => {
+    setData({
+      address: "", frequency: "", preferredDate: "", preferredTime: "",
+      name: "", email: "", phone: "",
+    });
+    setReference("");
+    setSubmitted(false);
+    setStep(1);
+  };
+
   const canNext =
     (step === 1 && data.address.trim().length > 3) ||
-    (step === 2 && data.frequency) ||
+    (step === 2 && data.frequency && data.preferredDate && data.preferredTime) ||
     step === 3;
 
   const submit = async (e) => {
@@ -40,6 +60,8 @@ export default function Estimator() {
         body: JSON.stringify({
           address: data.address,
           frequency: data.frequency,
+          preferred_date: data.preferredDate,
+          preferred_time: data.preferredTime,
           name: data.name,
           email: data.email,
           phone: data.phone,
@@ -125,6 +147,13 @@ export default function Estimator() {
               <p className="font-mono-coord text-xs tracking-wide text-blade/50 mt-6">
                 REF · {reference}
               </p>
+              <button
+                type="button"
+                onClick={startNewRequest}
+                className="inline-flex items-center gap-2 px-7 py-3 mt-8 bg-blade text-linen text-sm font-medium tracking-wide hover:bg-obsidian transition-colors"
+              >
+                Submit Another Request
+              </button>
             </div>
           ) : (
             <form onSubmit={submit}>
@@ -179,6 +208,36 @@ export default function Estimator() {
                         </p>
                       </button>
                     ))}
+                  </div>
+
+                  <div className="mt-8">
+                    <label className="flex items-center gap-2 font-mono-coord text-xs tracking-[0.2em] text-blade/60 mb-4">
+                      <Calendar size={14} /> PREFERRED START DATE &amp; TIME
+                    </label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <input
+                        type="date"
+                        required
+                        min={todayISO()}
+                        value={data.preferredDate}
+                        onChange={(e) => setData({ ...data, preferredDate: e.target.value })}
+                        className="w-full bg-transparent border-b-2 border-blade/20 focus:border-gold py-3 text-base font-light outline-none transition-colors"
+                      />
+                      <select
+                        required
+                        value={data.preferredTime}
+                        onChange={(e) => setData({ ...data, preferredTime: e.target.value })}
+                        className="w-full bg-transparent border-b-2 border-blade/20 focus:border-gold py-3 text-base font-light outline-none transition-colors"
+                      >
+                        <option value="" disabled>Time window</option>
+                        {TIME_WINDOWS.map((t) => (
+                          <option key={t.id} value={t.id}>{t.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="text-sm text-blade/50 mt-3 font-light">
+                      We'll aim for this window for your first visit.
+                    </p>
                   </div>
                 </div>
               )}

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
-from datetime import datetime
+from typing import Optional, Literal
+from datetime import datetime, date
 
 
 class BookingCreate(BaseModel):
@@ -9,6 +9,8 @@ class BookingCreate(BaseModel):
     name: str
     email: EmailStr
     phone: str
+    preferred_date: date
+    preferred_time: Literal["morning", "afternoon", "evening"]
 
 
 class BookingResponse(BaseModel):
@@ -19,6 +21,8 @@ class BookingResponse(BaseModel):
     name: str
     email: str
     phone: Optional[str]
+    preferred_date: Optional[date]
+    preferred_time: Optional[str]
     status: str
     created_at: datetime
     updated_at: datetime

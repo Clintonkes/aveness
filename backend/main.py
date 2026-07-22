@@ -92,6 +92,8 @@ def create_booking(data: BookingCreate, db: Session = Depends(get_db)):
         name=data.name,
         email=data.email,
         phone=data.phone,
+        preferred_date=data.preferred_date,
+        preferred_time=data.preferred_time,
         status="pending",
     )
     db.add(booking)
@@ -100,12 +102,14 @@ def create_booking(data: BookingCreate, db: Session = Depends(get_db)):
 
     send_email(
         to_email=data.email,
-        subject=f"Your Aveness Service Request — {reference}",
+        subject=f"Your Aveness Service Request {reference}",
         html_body=booking_confirmation_html(
             name=data.name,
             reference=reference,
             address=data.address,
             frequency=data.frequency,
+            preferred_date=data.preferred_date,
+            preferred_time=data.preferred_time,
         ),
     )
 
